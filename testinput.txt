@@ -1,0 +1,16 @@
+display
+add little brown fox
+display
+add jumped over the moon
+display
+add I am happy
+display
+delete 2
+delete 4
+delete a
+delete 1
+add Its going well
+display
+clear
+display
+exit
