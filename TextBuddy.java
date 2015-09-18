@@ -25,11 +25,11 @@ import java.lang.System;
 
 public class TextBuddy {
 	//These messages shown to the user are defined in one place for easy accessing and editing.
-	private static final String INVALID_MESSAGE = "Invaid Command";
-	private static final String ADD_MESSAGE = "added to %s: \"%s\"";
-	private static final String DELETE_MESSAGE = "deleted from %s: \"%s\"";
-	private static final String CLEAR_MESSAGE = "all content deleted from %s";
-	private static final String SORT_MESSAGE = "all content sorted alphabetically";
+	private static final String INVALID_MESSAGE = "Invaid Command\n";
+	private static final String ADD_MESSAGE = "added to %s:\"%s\"\n";
+	private static final String DELETE_MESSAGE = "deleted from %s: \"%s\"\n";
+	private static final String CLEAR_MESSAGE = "all content deleted from %s\n";
+	private static final String SORT_MESSAGE = "all content sorted alphabetically\n";
 	
 	//These are possible command types
 	enum COMMAND_TYPE {
@@ -108,7 +108,7 @@ public class TextBuddy {
 			System.out.println(String.format(INVALID_MESSAGE));
 		} else {
 			COMMAND_TYPE command = determineCommandType(userCommand);
-			executeCommand(command);
+			result=executeCommand(command);
 			System.out.println(result);
 		}
 	}  
@@ -143,26 +143,32 @@ public class TextBuddy {
 	/* If the rest of the program is correct, this error will never be thrown.
 	 * That is why we use an Error instead of an Exception.
 	 */
-	private static void executeCommand(COMMAND_TYPE command) throws Error {
+	private static String executeCommand(COMMAND_TYPE command) throws Error {
 		String result;
 		switch(command) {
 			case ADD:  
-				addCommand(sc.nextLine());
+				result=addCommand(sc.nextLine());
+				return result;
 				//break;
 			case DISPLAY: 
-				displayCommand();
+				result=displayCommand();
+				return result;
 				//break;
 			case DELETE:  
-				deleteCommand();
+				result=deleteCommand();
+				return result;
 				//break;
 			case CLEAR: 
-				clearCommand();
+				result=clearCommand();
+				return result;
 				//break;
 			case SORT:
-				sortCommand();
+				result=sortCommand();
+				return result;
 				//break;
 			case SEARCH:
-				searchCommand(sc.nextLine());
+				result=searchCommand(sc.nextLine().trim());
+				return result;
 				//break;
 			case EXIT: 
 				System.exit(0);
@@ -197,93 +203,115 @@ public class TextBuddy {
 	 * 				is the word(s) after the add command to be 
 	 *  			added to the file.
 	 */
-	public static void addCommand(String lineAdded) {
+	public static String addCommand(String lineAdded) {
 		arrFile.add(lineAdded);
 		store();
-		System.out.println(String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
+		return (String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
+		//System.out.println(String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
 	}
 	
 	/**
 	 * This operation display the data in the text file.
 	 * But it will also show that the file is empty if it is.				
 	 */
-	public static void displayCommand() {
+	public static String displayCommand() {
 		Integer index = 0;
 		String result="";
 		if(arrFile.size() == 0) {
-			System.out.println(documentName+" is empty");
+			return (String.format(documentName + "is empty", ""));
+			//return result;
+			//System.out.println(documentName+" is empty");
 		}
 		while(index < arrFile.size()) {
 			index++;
-			System.out.println(index.toString() + ". " + arrFile.get(index-1));
+			result=index.toString() + ". " + arrFile.get(index-1);
+			return result;
+			//System.out.println(index.toString() + ". " + arrFile.get(index-1));
 		}	
+		return result;
 	}
 	
 	/**
 	 * This operation delete the particular data preferred by the user.
 	 * Exception is used for cases where the user types a non-number to delete.
 	 */
-	public static void deleteCommand(){
-		int deleteIndex;
+	public static String deleteCommand(){
+		Integer deleteIndex;
 		String lineRemoved, result="";
 		try {
 			deleteIndex = sc.nextInt()-1;
+			if(deleteIndex.toString().isEmpty()) {
+				result="Error! Please type a number to delete.";
+			}
 			if((deleteIndex < arrFile.size() && ((deleteIndex+1) > 0))) {
 				lineRemoved = arrFile.get(deleteIndex);
 				arrFile.remove(deleteIndex);
 				store();
-				System.out.println(String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved));
+				result=String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved);
+				//System.out.println(String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved));
 			} else {
-				System.out.println("Number not found");
+				result="Number not found";
+				//System.out.println("Number not found");
 			}
 		} catch(Exception e){
-			System.out.println("Error! Please type a number to delete.");
+			result="Error! Please type a number to delete.";
+			//System.out.println("Error! Please type a number to delete.");
 			sc.nextLine();
 		}
+		return result;
 	}
 	
 	/**
 	 * This operation clears all data in the text file
 	 * and states that it has cleared all the contents in the text file.
 	 */
-	public static void clearCommand() {
+	public static String clearCommand() {
+		String result="";
 		arrFile.clear();
 		store();
-		System.out.println(String.format(CLEAR_MESSAGE, documentName));
+		result=String.format(CLEAR_MESSAGE, documentName);
+		return result;
+		//System.out.println(String.format(CLEAR_MESSAGE, documentName));
 	}
 	
 	/**
 	 * This operation sorts the elements in the text file 
 	 * alphabetically.
 	 */
-	public static void sortCommand() {
+	public static String sortCommand() {
 		Collections.sort(arrFile);
 		store();
-		System.out.println(SORT_MESSAGE);
+		return SORT_MESSAGE;
+		//System.out.println(SORT_MESSAGE);
 	}
 	
 	/**
 	 * This operation searches for the element(s) that contains
 	 * the input character(s).
 	 */
-	public static void searchCommand(String searchString) {
-		Integer searchIndex;
+	public static String searchCommand(String searchString) {
+		int searchIndex, numItemsFound=0;
 		String stringInArrList="", result="";
-		boolean isContained;
 		try {
+			if(searchString.equals(null)||searchString.equals("")) {
+				return result="Error! Please type an input to search.";
+			}
 			searchString=searchString.trim();
 			for(searchIndex=0; searchIndex<arrFile.size(); searchIndex++) {
-				stringInArrList=arrFile.get(searchIndex).trim();
-				isContained=stringInArrList.contains(searchString);
-				if(isContained) {
-					searchIndex++;
-					System.out.println(searchIndex.toString() + ". " + arrFile.get(searchIndex-1));
-					searchIndex--;
+				//stringInArrList=arrFile.get(searchIndex).trim();
+				if(arrFile.get(searchIndex).toString().contains(searchString)) {
+					numItemsFound++;
+					result=result.concat(numItemsFound + ". " + arrFile.get(searchIndex) + "\n");
 				}
 			}
+			if(numItemsFound==0) {
+				result="No such element!";
+			}
 		} catch (Exception e) {
-			System.out.println("Error! Please type an input to search.");
+			//System.out.println("Error! Please type an input to search.");
+			result="Error! Please type an input to search.";
 		}
+		return result;
 	}
 }
 
