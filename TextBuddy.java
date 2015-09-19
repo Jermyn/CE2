@@ -214,9 +214,8 @@ public class TextBuddy {
 	/**
 	 * This operation executes the add command to insert the 
 	 * data into the text file.
-	 * @param lineAdded 
-	 * 				is the word(s) after the add command to be 
-	 *  			added to the file.
+	 * @param lineAdded 	lineAdded is the word(s) after 
+	 * the add command to be added to the file.
 	 */
 	public static String addCommand(String lineAdded) {
 		if (lineAdded!="") {
