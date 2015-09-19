@@ -1,4 +1,4 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.Before;
@@ -30,6 +30,7 @@ public class TextBuddyTest {
 		assertEquals("search nt", ("No such element\n"), TextBuddy.searchCommand("nt"));
 		assertEquals("search sin", ("1. singapore\n"), TextBuddy.searchCommand("sin"));
 		assertEquals("search ia", ("1. malaysia\n2. indonesia\n3. india\n"), TextBuddy.searchCommand("ia"));
+		assertEquals("search without any input", ("Error! Please type a number to delete.\n"), TextBuddy.searchCommand(""));
 		assertEquals("search ma", ("1. malaysia\n"), TextBuddy.searchCommand("ma"));
 		assertEquals("search do", ("1. indonesia\n"), TextBuddy.searchCommand("do"));
 		assertEquals("search es", ("1. west\n2. indonesia\n"), TextBuddy.searchCommand("es"));
@@ -37,6 +38,7 @@ public class TextBuddyTest {
 		assertEquals("search zi", ("No such element\n"), TextBuddy.searchCommand("zi"));
 		assertEquals("clear texts in file", ("all content deleted from mytextfile\n"), TextBuddy.clearCommand());
 		assertEquals("search ias", ("mytextfile is empty\n"), TextBuddy.searchCommand("zi"));
+		assertEquals("search without any input", ("Error! Please type a number to delete.\n"), TextBuddy.searchCommand(""));
 	}
 	
 	@Test
