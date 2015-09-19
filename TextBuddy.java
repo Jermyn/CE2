@@ -25,11 +25,18 @@ import java.lang.System;
 
 public class TextBuddy {
 	//These messages shown to the user are defined in one place for easy accessing and editing.
-	private static final String INVALID_MESSAGE = "Invaid Command\n";
-	private static final String ADD_MESSAGE = "added to %s:\"%s\"\n";
-	private static final String DELETE_MESSAGE = "deleted from %s: \"%s\"\n";
-	private static final String CLEAR_MESSAGE = "all content deleted from %s\n";
-	private static final String SORT_MESSAGE = "all content sorted alphabetically\n";
+	private static final String INVALID_MESSAGE = "Invaid Command";
+	private static final String ADD_MESSAGE = "added to %s:\"%s\"";
+	private static final String DELETE_MESSAGE = "deleted from %s: \"%s\"";
+	private static final String EMPTY_DELETE_MESSAGE="Error! Please type a number to delete.";
+	private static final String CLEAR_MESSAGE = "all content deleted from %s";
+	private static final String SORT_MESSAGE = "all content sorted alphabetically";
+	private static final String ERROR_ADD_MESSAGE="Type an input to add";
+	private static final String EMPTY_FILE_MESSAGE="%s is empty";
+	private static final String EMPTY_NUMBER_MESSAGE="Error! Please type a number to delete.";
+	private static final String EMPTY_MESSAGE="No such element";
+	private static final String INPUT_SEARCH_MESSAGE="Error! Please type an input to search.";
+	private static final String ERROR_NUMBER_NOT_FOUND="Number not found";
 	
 	//These are possible command types
 	enum COMMAND_TYPE {
@@ -147,7 +154,7 @@ public class TextBuddy {
 		String result;
 		switch(command) {
 			case ADD:  
-				result=addCommand(sc.nextLine());
+				result=addCommand(sc.next());
 				return result;
 				//break;
 			case DISPLAY: 
@@ -167,7 +174,7 @@ public class TextBuddy {
 				return result;
 				//break;
 			case SEARCH:
-				result=searchCommand(sc.nextLine().trim());
+				result=searchCommand(sc.next().trim());
 				return result;
 				//break;
 			case EXIT: 
@@ -204,9 +211,14 @@ public class TextBuddy {
 	 *  			added to the file.
 	 */
 	public static String addCommand(String lineAdded) {
-		arrFile.add(lineAdded);
-		store();
-		return (String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
+		if(lineAdded!="") {
+			arrFile.add(lineAdded);
+			store();
+			return (String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
+		}
+		else {
+			return (String.format(ERROR_ADD_MESSAGE.trim(), ""));
+		}
 		//System.out.println(String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
 	}
 	
@@ -218,16 +230,15 @@ public class TextBuddy {
 		Integer index = 0;
 		String result="";
 		if(arrFile.size() == 0) {
-			return (String.format(documentName + "is empty", ""));
+			return (String.format(EMPTY_FILE_MESSAGE.trim(), documentName));
 			//return result;
 			//System.out.println(documentName+" is empty");
 		}
 		while(index < arrFile.size()) {
 			index++;
-			result=index.toString() + ". " + arrFile.get(index-1);
-			return result;
+			result=result.concat(index + ". " + arrFile.get(index-1) + "\n");
 			//System.out.println(index.toString() + ". " + arrFile.get(index-1));
-		}	
+		}
 		return result;
 	}
 	
@@ -236,29 +247,34 @@ public class TextBuddy {
 	 * Exception is used for cases where the user types a non-number to delete.
 	 */
 	public static String deleteCommand(){
-		Integer deleteIndex;
+		int deleteIndex;
+		Integer deleteID;
 		String lineRemoved, result="";
 		try {
-			deleteIndex = sc.nextInt()-1;
-			if(deleteIndex.toString().isEmpty()) {
-				result="Error! Please type a number to delete.";
+			//System.out.println(sc.nextInt());
+			deleteIndex=sc.nextInt()-1;
+			deleteID=new Integer(deleteIndex);
+			if(deleteID.toString().isEmpty()) {
+				result=EMPTY_DELETE_MESSAGE;
+				sc.nextLine();
+				return result;
 			}
 			if((deleteIndex < arrFile.size() && ((deleteIndex+1) > 0))) {
 				lineRemoved = arrFile.get(deleteIndex);
 				arrFile.remove(deleteIndex);
 				store();
-				result=String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved);
+				return result=String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved);
 				//System.out.println(String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved));
 			} else {
-				result="Number not found";
+				return ERROR_NUMBER_NOT_FOUND;
 				//System.out.println("Number not found");
 			}
 		} catch(Exception e){
-			result="Error! Please type a number to delete.";
-			//System.out.println("Error! Please type a number to delete.");
+			result=EMPTY_DELETE_MESSAGE;
 			sc.nextLine();
+			return result;
+			//System.out.println("Error! Please type a number to delete.");
 		}
-		return result;
 	}
 	
 	/**
@@ -279,10 +295,13 @@ public class TextBuddy {
 	 * alphabetically.
 	 */
 	public static String sortCommand() {
-		Collections.sort(arrFile);
-		store();
-		return SORT_MESSAGE;
-		//System.out.println(SORT_MESSAGE);
+		if(arrFile.isEmpty()) {
+			return EMPTY_FILE_MESSAGE;
+		} else {
+			Collections.sort(arrFile);
+			store();
+			return SORT_MESSAGE;
+		}
 	}
 	
 	/**
@@ -291,10 +310,10 @@ public class TextBuddy {
 	 */
 	public static String searchCommand(String searchString) {
 		int searchIndex, numItemsFound=0;
-		String stringInArrList="", result="";
+		String result="";
 		try {
 			if(searchString.equals(null)||searchString.equals("")) {
-				return result="Error! Please type an input to search.";
+				return EMPTY_NUMBER_MESSAGE;
 			}
 			searchString=searchString.trim();
 			for(searchIndex=0; searchIndex<arrFile.size(); searchIndex++) {
@@ -305,11 +324,11 @@ public class TextBuddy {
 				}
 			}
 			if(numItemsFound==0) {
-				result="No such element!";
+				return EMPTY_MESSAGE;
 			}
 		} catch (Exception e) {
 			//System.out.println("Error! Please type an input to search.");
-			result="Error! Please type an input to search.";
+			return INPUT_SEARCH_MESSAGE;
 		}
 		return result;
 	}
