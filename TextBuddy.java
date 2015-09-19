@@ -1,4 +1,5 @@
 
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.File;
 
 import java.lang.System;
+import java.lang.reflect.Array;
 
 /**
  * This class is used to manipulate text in a file.
@@ -25,18 +27,18 @@ import java.lang.System;
 
 public class TextBuddy {
 	//These messages shown to the user are defined in one place for easy accessing and editing.
-	private static final String INVALID_MESSAGE = "Invaid Command";
-	private static final String ADD_MESSAGE = "added to %s:\"%s\"";
-	private static final String DELETE_MESSAGE = "deleted from %s: \"%s\"";
-	private static final String EMPTY_DELETE_MESSAGE="Error! Please type a number to delete.";
-	private static final String CLEAR_MESSAGE = "all content deleted from %s";
-	private static final String SORT_MESSAGE = "all content sorted alphabetically";
-	private static final String ERROR_ADD_MESSAGE="Type an input to add";
-	private static final String EMPTY_FILE_MESSAGE="%s is empty";
-	private static final String EMPTY_NUMBER_MESSAGE="Error! Please type a number to delete.";
-	private static final String EMPTY_MESSAGE="No such element";
-	private static final String INPUT_SEARCH_MESSAGE="Error! Please type an input to search.";
-	private static final String ERROR_NUMBER_NOT_FOUND="Number not found";
+	private static final String INVALID_MESSAGE = "Invaid Command\n";
+	private static final String ADD_MESSAGE = "added to %s:\"%s\"\n";
+	private static final String DELETE_MESSAGE = "deleted from %s: \"%s\"\n";
+	private static final String EMPTY_DELETE_MESSAGE="Error! Please type a number to delete.\n";
+	private static final String CLEAR_MESSAGE = "all content deleted from %s\n";
+	private static final String SORT_MESSAGE = "all content sorted alphabetically\n";
+	private static final String ERROR_ADD_MESSAGE="Type an input to add\n";
+	private static final String EMPTY_FILE_MESSAGE="%s is empty\n";
+	private static final String EMPTY_NUMBER_MESSAGE="Error! Please type a number to delete.\n";
+	private static final String EMPTY_MESSAGE="No such element\n";
+	private static final String INPUT_SEARCH_MESSAGE="Error! Please type an input to search.\n";
+	private static final String ERROR_NUMBER_NOT_FOUND="Number not found\n";
 	
 	//These are possible command types
 	enum COMMAND_TYPE {
@@ -92,7 +94,7 @@ public class TextBuddy {
 			read = new FileReader(fileName);
 			reader = new BufferedReader(read);
 			arrFile = new ArrayList<String>();
-			System.out.println("Welcome to TextBuddy. " + fileName + " is ready for use");
+			System.out.print("Welcome to TextBuddy. " + fileName + " is ready for use");
 		} catch(FileNotFoundException e) {
 			System.out.println("File not found! Please type the correct file.");
 			e.printStackTrace();
@@ -101,7 +103,8 @@ public class TextBuddy {
 	}
 	
 	private static void userTypeCommand() {
-		String commandString, result;
+		String commandString;
+		System.out.println();
 		while (true) {
 			System.out.print("command: ");
 			commandString = sc.next();
@@ -116,7 +119,8 @@ public class TextBuddy {
 		} else {
 			COMMAND_TYPE command = determineCommandType(userCommand);
 			result=executeCommand(command);
-			System.out.println(result);
+			System.out.print(result);
+			//System.out.println();
 		}
 	}  
 	
@@ -214,10 +218,10 @@ public class TextBuddy {
 		if(lineAdded!="") {
 			arrFile.add(lineAdded);
 			store();
-			return (String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
+			return (String.format(ADD_MESSAGE, documentName, lineAdded));
 		}
 		else {
-			return (String.format(ERROR_ADD_MESSAGE.trim(), ""));
+			return ERROR_ADD_MESSAGE;
 		}
 		//System.out.println(String.format(ADD_MESSAGE.trim(), documentName, lineAdded));
 	}
@@ -230,7 +234,7 @@ public class TextBuddy {
 		Integer index = 0;
 		String result="";
 		if(arrFile.size() == 0) {
-			return (String.format(EMPTY_FILE_MESSAGE.trim(), documentName));
+			return (String.format(EMPTY_FILE_MESSAGE, documentName));
 			//return result;
 			//System.out.println(documentName+" is empty");
 		}
@@ -263,7 +267,7 @@ public class TextBuddy {
 				lineRemoved = arrFile.get(deleteIndex);
 				arrFile.remove(deleteIndex);
 				store();
-				return result=String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved);
+				return result=String.format(DELETE_MESSAGE, documentName, lineRemoved);
 				//System.out.println(String.format(DELETE_MESSAGE.trim(), documentName, lineRemoved));
 			} else {
 				return ERROR_NUMBER_NOT_FOUND;
@@ -296,7 +300,7 @@ public class TextBuddy {
 	 */
 	public static String sortCommand() {
 		if(arrFile.isEmpty()) {
-			return EMPTY_FILE_MESSAGE;
+			return String.format(EMPTY_FILE_MESSAGE, documentName);
 		} else {
 			Collections.sort(arrFile);
 			store();
@@ -312,7 +316,10 @@ public class TextBuddy {
 		int searchIndex, numItemsFound=0;
 		String result="";
 		try {
-			if(searchString.equals(null)||searchString.equals("")) {
+			if(arrFile.size()==0) {
+				return String.format(EMPTY_FILE_MESSAGE, documentName);
+			}
+			else if(searchString.equals(null)||searchString.equals("")) {
 				return EMPTY_NUMBER_MESSAGE;
 			}
 			searchString=searchString.trim();
